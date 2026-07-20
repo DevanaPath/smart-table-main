@@ -4,16 +4,21 @@ export function initSorting(columns) {
     return (data, state, action) => {
         let field = null;
         let order = null;
+
         if (action && action.name === 'sort') {
+            // @todo: #3.1
             action.dataset.value = sortMap[action.dataset.value];
             field = action.dataset.field;
             order = action.dataset.value;
+
+            // @todo: #3.2
             columns.forEach(column => {
                 if (column.dataset.field !== action.dataset.field) {
                     column.dataset.value = 'none';
                 }
             });
         } else {
+            // @todo: #3.3
             columns.forEach(column => {
                 if (column.dataset.value !== 'none') {
                     field = column.dataset.field;
@@ -21,6 +26,7 @@ export function initSorting(columns) {
                 }
             });
         }
+
         return sortCollection(data, field, order);
-    };
+    }
 }
