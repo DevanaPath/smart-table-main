@@ -21,10 +21,20 @@ const {data, ...indexes} = initData(sourceData);
 function collectState() {
     const state = processFormData(new FormData(sampleTable.container));
 
-    const rowsPerPage = parseInt(state.rowsPerPage);    
-    const page = parseInt(state.page ?? 1);                
+    const rowsPerPage = parseInt(state.rowsPerPage);
+    const page = parseInt(state.page ?? 1);
 
-    return {                                            
+    if (state.totalFrom || state.totalTo) {
+        state.total = [
+            state.totalFrom ? parseFloat(state.totalFrom) : undefined,
+            state.totalTo ? parseFloat(state.totalTo) : undefined
+        ];
+        // Удаляем старые отдельные поля, чтобы они не мешали
+        delete state.totalFrom;
+        delete state.totalTo;
+    }
+
+    return {
         ...state,
         rowsPerPage,
         page
