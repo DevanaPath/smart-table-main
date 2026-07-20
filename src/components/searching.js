@@ -1,17 +1,14 @@
 import {rules, createComparison} from "../lib/compare.js";
 
 export function initSearching(searchField) {
+    // РЕШЕНИЕ: Добавляем нашу функцию в словарь правил библиотеки.
+    // Теперь, когда compare.js захочет вызвать rules['search'](), он найдет её здесь!
+    rules[searchField] = rules.searchMultipleFields(searchField, ['date', 'customer', 'seller'], false);
+
     // @todo: #5.1 — настроить компаратор
     const compare = createComparison(
-        // 1. Массив имен полей, которые мы проверяем
-        [searchField], 
-        
-        // 2. Настройки + карта кастомных функций
-        { 
-            skipEmptyTargetValues: true,
-            // Говорим библиотеке: "Если попросят проверить поле searchField, используй эту функцию"
-            [searchField]: rules.searchMultipleFields(searchField, ['date', 'customer', 'seller'], false)
-        }
+        [searchField], // Передаем просто массив имен полей (строк)
+        { skipEmptyTargetValues: true } // Настройки
     );
 
     return (data, state, action) => {
