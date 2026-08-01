@@ -9,7 +9,7 @@ import {processFormData} from "./lib/utils.js";
 import {initTable} from "./components/table.js";
 import {initPagination} from "./components/pagination.js";
 import {initSorting} from "./components/sorting.js";
-import {initFiltering} from "./components/filtering.js";
+// import {initFiltering} from "./components/filtering.js"; // Шаг 0: временно отключаем импорт
 import {initSearching} from "./components/searching.js";
 
 // Исходные данные используемые в render()
@@ -29,7 +29,6 @@ function collectState() {
             state.totalFrom ? parseFloat(state.totalFrom) : undefined,
             state.totalTo ? parseFloat(state.totalTo) : undefined
         ];
-        // Удаляем старые отдельные поля, чтобы они не мешали
         delete state.totalFrom;
         delete state.totalTo;
     }
@@ -48,11 +47,11 @@ function render(action) {
     let state = collectState(); 
     let result = [...data]; 
     
-    // Конвейер обработки данных
-    result = applySearch(result, state, action);      
-    result = applyFiltering(result, state, action);   
-    result = applySorting(result, state, action);     
-    result = applyPagination(result, state, action);  
+    // Шаг 0: Временно комментируем весь конвейер обработки данных
+    // result = applySearch(result, state, action);      
+    // result = applyFiltering(result, state, action);   
+    // result = applySorting(result, state, action);     
+    // result = applyPagination(result, state, action);  
 
     sampleTable.render(result)
 }
@@ -82,9 +81,11 @@ const applySorting = initSorting([
     sampleTable.header.elements.sortByTotal
 ]);
 
-const applyFiltering = initFiltering(sampleTable.filter.elements, {
-    searchBySeller: indexes.sellers
-});
+// Шаг 0: Временно комментируем инициализацию фильтров 
+// (т.к. она требует синхронных данных indexes.sellers, а скоро они станут асинхронными)
+// const applyFiltering = initFiltering(sampleTable.filter.elements, {
+//     searchBySeller: indexes.sellers
+// });
 
 const applySearch = initSearching('search');
 
