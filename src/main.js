@@ -107,4 +107,4 @@ async function init() {
 }
 
 // Запуск: сначала инициализация (загрузка селектов), затем рендер
-init().then(render);
+await init().then(render);
