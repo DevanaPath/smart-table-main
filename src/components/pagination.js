@@ -3,13 +3,14 @@ import { getPages } from "../lib/utils.js";
 export function initPagination(elements, createPage) {
     const { pages, fromRow, toRow, totalRows } = elements;
 
-    return (data, state, action) => {
-        // @todo: #2.1
-        const rowsPerPage = state.rowsPerPage;
-        const pageCount = Math.ceil(data.length / rowsPerPage);
+    let pageCount; // Для хранения общего кол-ва страниц (нужно для кнопки "Последняя")
+
+    // 1. Формируем параметры для запроса
+    const applyPagination = (query, state, action) => {
+        const limit = state.rowsPerPage;
         let page = state.page;
 
-        // @todo: #2.6 (Важно ставим ДО отрисовки кнопок!)
+        // Обработка кнопок переключения страниц (код из старого @todo: #2.6)
         if (action) switch(action.name) {
             case 'prev': page = Math.max(1, page - 1); break;
             case 'next': page = Math.min(pageCount, page + 1); break;
@@ -17,24 +18,35 @@ export function initPagination(elements, createPage) {
             case 'last': page = pageCount; break;
         }
 
-        // @todo: #2.3
+        // Добавляем limit и page в общий объект запроса
+        return Object.assign({}, query, {
+            limit,
+            page
+        });
+    }
+
+    // 2. Перерисовываем пагинатор после получения данных
+    const updatePagination = (total, { page, limit }) => {
+        pageCount = Math.ceil(total / limit);
+
+        // Отрисовка кнопок (код из старого @todo: #2.3 и #2.4)
         const pageTemplate = pages.firstElementChild.cloneNode(true);
         pages.firstElementChild.remove();
 
-        // @todo: #2.4
         const visiblePages = getPages(page, pageCount, 5);
         pages.replaceChildren(...visiblePages.map(pageNumber => {
             const el = pageTemplate.cloneNode(true);
             return createPage(el, pageNumber, pageNumber === page);
         }));
 
-        // @todo: #2.5
-        fromRow.textContent = (page - 1) * rowsPerPage + 1;
-        toRow.textContent = Math.min((page * rowsPerPage), data.length);
-        totalRows.textContent = data.length;
+        // Обновление текста статуса (код из старого @todo: #2.5, rowsPerPage заменен на limit)
+        fromRow.textContent = (page - 1) * limit + 1;
+        toRow.textContent = Math.min((page * limit), total);
+        totalRows.textContent = total;
+    }
 
-        // @todo: #2.2
-        const skip = (page - 1) * rowsPerPage;
-        return data.slice(skip, skip + rowsPerPage);
+    return {
+        updatePagination,
+        applyPagination
     }
 }
