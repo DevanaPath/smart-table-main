@@ -2,11 +2,11 @@ import { getPages } from "../lib/utils.js";
 
 export function initPagination(elements, createPage) {
   const { pages, fromRow, toRow, totalRows } = elements;
-  let pageCount = 1; // ← инициализация по умолчанию
+  let pageCount = 1;
 
   const applyPagination = (query, state, action) => {
-    const limit = parseInt(state.rowsPerPage, 10) || 10; // ← защита
-    let page = parseInt(state.page, 10) || 1;            // ← защита
+    const limit = parseInt(state.rowsPerPage, 10) || 10;
+    let page = parseInt(state.page, 10) || 1;
 
     if (action) {
       switch (action.name) {

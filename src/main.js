@@ -22,7 +22,7 @@ function collectState() {
   
   if (state.totalFrom || state.totalTo) {
     state.total = [
-      state.totalFrom ? parseFloat(state.totalFrom) : undefined, 
+      state.totalFrom ? parseFloat(state.totalFrom) : undefined,
       state.totalTo ? parseFloat(state.totalTo) : undefined
     ];
     delete state.totalFrom;
@@ -82,7 +82,7 @@ const applySorting = initSorting([
 
 const {applyFiltering, updateIndexes} = initFiltering(sampleTable.filter.elements);
 
-// Если в HTML у поля поиска name="search", должно быть 'search'. 
+// Если в HTML у поля поиска name="search", должно быть 'search'.
 // Если там написано name="поиск", верните 'поиск'
 const applySearch = initSearching('search');
 
