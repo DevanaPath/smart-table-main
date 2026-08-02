@@ -1,7 +1,6 @@
 import "./fonts/ys-display/fonts.css";
 import "./style.css";
 
-import { data as sourceData } from "./data/dataset_1.js";
 import { initData } from "./data.js";
 import { processFormData } from "./lib/utils.js";
 
@@ -11,22 +10,22 @@ import { initSorting } from "./components/sorting.js";
 import { initFiltering } from "./components/filtering.js";
 import { initSearching } from "./components/searching.js";
 
-const api = initData(sourceData);
+const api = initData();
 
 function collectState() {
   const state = processFormData(new FormData(sampleTable.container));
   const rowsPerPage = parseInt(state.rowsPerPage ?? "10", 10) || 10;
   const page = parseInt(state.page ?? 1, 10) || 1;
-
+  
   if (state.totalFrom || state.totalTo) {
     state.total = [
-      state.totalFrom ? parseFloat(state.totalFrom) : undefined,
+      state.totalFrom ? parseFloat(state.totalFrom) : undefined, 
       state.totalTo ? parseFloat(state.totalTo) : undefined
     ];
     delete state.totalFrom;
     delete state.totalTo;
   }
-
+  
   return { ...state, rowsPerPage, page };
 }
 
