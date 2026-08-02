@@ -1,8 +1,6 @@
-import {makeIndex} from "./lib/utils.js";
+const BASE_URL = 'https://webinars.webdev.education-services.ru/sp7-api';
 
-export function initData(sourceData) {
-  const BASE_URL = 'https://webinars.webdev.education-services.ru/sp7-api';
-  
+export function initData() {
   let sellers;
   let customers;
   let lastResult;
@@ -16,17 +14,35 @@ export function initData(sourceData) {
     total: item.total_amount
   }));
 
+  const fetchIndexes = async () => {
+    const [sellersList, customersList] = await Promise.all([
+      fetch(`${BASE_URL}/sellers`).then(res => res.json()),
+      fetch(`${BASE_URL}/customers`).then(res => res.json()),
+    ]);
+    
+    // API отдаёт массивы — превращаем их в объекты { [id]: "Имя Фамилия" }
+    sellers = Array.isArray(sellersList)
+      ? Object.fromEntries(sellersList.map(s => [s.id, `${s.first_name} ${s.last_name}`]))
+      : sellersList;
+      
+    customers = Array.isArray(customersList)
+      ? Object.fromEntries(customersList.map(c => [c.id, `${c.first_name} ${c.last_name}`]))
+      : customersList;
+  };
+
   const getIndexes = async () => {
     if (!sellers || !customers) {
-      [sellers, customers] = await Promise.all([
-        fetch(`${BASE_URL}/sellers`).then(res => res.json()),
-        fetch(`${BASE_URL}/customers`).then(res => res.json()),
-      ]);
+      await fetchIndexes();
     }
     return { sellers, customers };
   };
 
-  const getRecords = async (query, isUpdated = false) => {
+  const getRecords = async (query = {}, isUpdated = false) => {
+    // Если индексы ещё не загружены — подгружаем
+    if (!sellers || !customers) {
+      await fetchIndexes();
+    }
+
     const qs = new URLSearchParams(query);
     const nextQuery = qs.toString();
 
@@ -36,12 +52,13 @@ export function initData(sourceData) {
 
     const response = await fetch(`${BASE_URL}/records?${nextQuery}`);
     const records = await response.json();
-    
+
     lastQuery = nextQuery;
     lastResult = {
-      total: Number(records.total) || 0,
-      items: mapRecords(records.items || [])
+      total: records.total,
+      items: mapRecords(records.items)
     };
+
     return lastResult;
   };
 

@@ -4,7 +4,7 @@ export function initTable(settings, onAction) {
   const { tableTemplate, rowTemplate, before, after } = settings;
   const root = cloneTemplate(tableTemplate);
 
-  before.reverse().forEach(subName => {
+  before.slice().reverse().forEach(subName => {
     root[subName] = cloneTemplate(subName);
     root.container.prepend(root[subName].container);
   });
@@ -21,17 +21,11 @@ export function initTable(settings, onAction) {
     onAction(e.submitter);
   });
 
-  const render = (data = []) => {
-    // Просто очищаем таблицу, если данных нет
-    if (!Array.isArray(data) || data.length === 0) {
-      root.elements.rows.innerHTML = '';
-      return;
-    }
-
+  const render = (data) => {
     const nextRows = data.map(item => {
       const row = cloneTemplate(rowTemplate);
       Object.keys(item).forEach(key => {
-        if (key in row.elements) {
+        if (row.elements[key]) {
           row.elements[key].textContent = item[key] ?? '';
         }
       });
