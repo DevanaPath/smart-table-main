@@ -6,7 +6,7 @@ export function initPagination(elements, createPage) {
   if (pages.firstElementChild) {
     pages.firstElementChild.remove();
   }
-  
+
   let pageCount;
 
   const applyPagination = (query, state, action) => {
@@ -30,12 +30,10 @@ export function initPagination(elements, createPage) {
   const updatePagination = (total, { page, limit }) => {
     pageCount = Math.ceil(total / limit);
     const visiblePages = getPages(page, pageCount, 5);
-    
     pages.replaceChildren(...visiblePages.map(pageNumber => {
       const el = pageTemplate.cloneNode(true);
       return createPage(el, pageNumber, pageNumber === page);
     }));
-
     fromRow.textContent = (page - 1) * limit + 1;
     toRow.textContent = Math.min(page * limit, total);
     totalRows.textContent = total;
