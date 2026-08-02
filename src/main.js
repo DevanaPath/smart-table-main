@@ -19,48 +19,38 @@ const api = initData(sourceData);
  * Сбор и обработка полей таблицы
  */
 function collectState() {
-    const state = processFormData(new FormData(sampleTable.container));
-
-    const rowsPerPage = parseInt(state.rowsPerPage);
-    const page = parseInt(state.page ?? 1);
-
-    if (state.totalFrom || state.totalTo) {
-        state.total = [
-            state.totalFrom ? parseFloat(state.totalFrom) : undefined,
-            state.totalTo ? parseFloat(state.totalTo) : undefined
-        ];
-        delete state.totalFrom;
-        delete state.totalTo;
-    }
-
-    return {
-        ...state,
-        rowsPerPage,
-        page
-    };
+  const state = processFormData(new FormData(sampleTable.container));
+  const rowsPerPage = parseInt(state.rowsPerPage);
+  const page = parseInt(state.page ?? 1);
+  
+  if (state.totalFrom || state.totalTo) {
+    state.total = [
+      state.totalFrom ? parseFloat(state.totalFrom) : undefined, 
+      state.totalTo ? parseFloat(state.totalTo) : undefined
+    ];
+    delete state.totalFrom;
+    delete state.totalTo;
+  }
+  
+  return { ...state, rowsPerPage, page };
 }
 
 /**
  * 2. Функцию render() делаем асинхронной
  */
 async function render(action) {
-    let state = collectState(); 
-    
-    // Заменяем копирование данных на пустой объект запроса
-    let query = {}; 
-    
-    // Запускаем конвейер (теперь он модифицирует query, а не данные)
-    query = applySearch(query, state, action);      
-    query = applyFiltering(query, state, action);   
-    query = applySorting(query, state, action);     
-    query = applyPagination(query, state, action);  
-
-    // Делаем запрос к серверу с собранными параметрами
-    const { total, items } = await api.getRecords(query);
-
-    // Обновляем UI после получения ответа
-    updatePagination(total, query);
-    sampleTable.render(items);
+  let state = collectState();
+  let query = {};
+  
+  query = applySearch(query, state, action);
+  query = applyFiltering(query, state, action);
+  query = applySorting(query, state, action);
+  query = applyPagination(query, state, action);
+  
+  const { total, items } = await api.getRecords(query);
+  
+  updatePagination(total, query);
+  sampleTable.render(items); 
 }
 
 const sampleTable = initTable({
