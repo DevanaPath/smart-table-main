@@ -1,4 +1,4 @@
-import { makeIndex } from "./lib/utils.js";
+import {makeIndex} from "./lib/utils.js";
 
 export function initData(sourceData) {
   const BASE_URL = 'https://webinars.webdev.education-services.ru/sp7-api';
@@ -27,29 +27,22 @@ export function initData(sourceData) {
   };
 
   const getRecords = async (query, isUpdated = false) => {
-    try {
-      const qs = new URLSearchParams(query);
-      const nextQuery = qs.toString();
+    const qs = new URLSearchParams(query);
+    const nextQuery = qs.toString();
 
-      // Кеширование
-      if (lastQuery === nextQuery && !isUpdated) {
-        return lastResult;
-      }
-
-      const response = await fetch(`${BASE_URL}/records?${nextQuery}`);
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      
-      const records = await response.json();
-      lastQuery = nextQuery;
-      lastResult = {
-        total: Number(records.total) || 0,
-        items: mapRecords(records.items || [])
-      };
+    if (lastQuery === nextQuery && !isUpdated) {
       return lastResult;
-    } catch (err) {
-      console.error('API error:', err);
-      return { total: 0, items: [] };
     }
+
+    const response = await fetch(`${BASE_URL}/records?${nextQuery}`);
+    const records = await response.json();
+    
+    lastQuery = nextQuery;
+    lastResult = {
+      total: Number(records.total) || 0,
+      items: mapRecords(records.items || [])
+    };
+    return lastResult;
   };
 
   return { getIndexes, getRecords };

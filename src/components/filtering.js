@@ -6,9 +6,21 @@ export function initFiltering(elements) {
       const select = elements[elementName];
       if (!select) return;
       
-      // Очищаем старые значения (кроме placeholder'а)
-      Array.from(select.options).slice(1).forEach(opt => opt.remove());
+      // ПРИНУДИТЕЛЬНО добавляем пустой плейсхолдер, если его не было в HTML
+      let placeholder = select.querySelector('option[value=""]');
+      if (!placeholder) {
+        placeholder = document.createElement('option');
+        placeholder.value = '';
+        placeholder.textContent = 'Все';
+        select.prepend(placeholder);
+      }
+
+      // Очищаем старые варианты (кроме плейсхолдера)
+      Array.from(select.options).forEach(opt => {
+        if (opt !== placeholder) opt.remove();
+      });
       
+      // Добавляем новые
       select.append(...Object.values(indexes[elementName]).map(name => {
         const el = document.createElement('option');
         el.textContent = name;
