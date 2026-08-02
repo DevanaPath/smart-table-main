@@ -49,8 +49,12 @@ export function initData(sourceData) {
     // Фильтрация
     for (const [key, val] of Object.entries(query)) {
       if (!val || !key.startsWith('filter[')) continue;
-      const field = key.slice(7, -1); // filter[X] → X
-      if (field === 'seller') {
+      const field = key.slice(7, -1);
+
+      if (field === 'date') {
+        list = list.filter(r => r.date.includes(val));
+      } 
+      else if (field === 'seller') {
         list = list.filter(r => (sellers?.[r.seller_id] ?? '') === val);
       } else if (field === 'customer') {
         list = list.filter(r => (customers?.[r.customer_id] ?? '') === val);
