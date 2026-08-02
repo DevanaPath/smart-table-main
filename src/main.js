@@ -20,18 +20,20 @@ const api = initData(sourceData);
  */
 function collectState() {
   const state = processFormData(new FormData(sampleTable.container));
-  const rowsPerPage = parseInt(state.rowsPerPage);
-  const page = parseInt(state.page ?? 1);
   
+  // ← исправлено: ?? не спасает от пустой строки, используем ||
+  const rowsPerPage = parseInt(state.rowsPerPage, 10) || 10;
+  const page = parseInt(state.page, 10) || 1;
+
   if (state.totalFrom || state.totalTo) {
     state.total = [
-      state.totalFrom ? parseFloat(state.totalFrom) : undefined, 
+      state.totalFrom ? parseFloat(state.totalFrom) : undefined,
       state.totalTo ? parseFloat(state.totalTo) : undefined
     ];
     delete state.totalFrom;
     delete state.totalTo;
   }
-  
+
   return { ...state, rowsPerPage, page };
 }
 
