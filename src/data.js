@@ -3,7 +3,7 @@ import {makeIndex} from "./lib/utils.js";
 export function initData(sourceData) {
   const BASE_URL = 'https://webinars.webdev.education-services.ru/sp7-api';
 
-  // Исправлено: приведены к единому нижнему регистру
+  // ИСПРАВЛЕНО: одинаковый регистр и название
   let sellers; 
   let customers;
   let lastResult;
@@ -18,9 +18,9 @@ export function initData(sourceData) {
   }));
 
   const getIndexes = async () => {
-    // Исправлено: используем правильные имена переменных
+    // ИСПРАВЛЕНО: проверяем правильные переменные
     if (!sellers || !customers) {
-      // Исправлено: деструктуризация в правильные переменные (было customer)
+      // ИСПРАВЛЕНО: сохраняем ответы в правильные переменные (было customer)
       [sellers, customers] = await Promise.all([
         fetch(`${BASE_URL}/sellers`).then(res => res.json()),
         fetch(`${BASE_URL}/customers`).then(res => res.json()),

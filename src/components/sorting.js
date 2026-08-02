@@ -17,7 +17,6 @@ export function initSorting(columns) {
     } else {
       columns.forEach(column => {
         if (column.dataset.value !== 'none') {
-          // Исправлено: было columns.dataset.field и columns.dataset.value
           field = column.dataset.field; 
           order = column.dataset.value;
         }
