@@ -21,9 +21,10 @@ export function initTable(settings, onAction) {
     onAction(e.submitter);
   });
 
-  const render = (data) => {
+  const render = (data = []) => {
+    // Просто очищаем таблицу, если данных нет
     if (!Array.isArray(data) || data.length === 0) {
-      root.elements.rows.innerHTML = '<tr><td colspan="100%">Нет данных</td></tr>';
+      root.elements.rows.innerHTML = '';
       return;
     }
 
