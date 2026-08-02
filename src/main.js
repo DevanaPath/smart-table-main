@@ -1,101 +1,100 @@
 import './fonts/ys-display/fonts.css'
 import './style.css'
-
 import {data as sourceData} from "./data/dataset_1.js";
-
 import {initData} from "./data.js";
 import {processFormData} from "./lib/utils.js";
-
 import {initTable} from "./components/table.js";
 import {initPagination} from "./components/pagination.js";
 import {initSorting} from "./components/sorting.js";
 import {initFiltering} from "./components/filtering.js";
 import {initSearching} from "./components/searching.js";
 
-// 1. Вызов initData присваиваем константе API
+// 1. Вызов initData присваивает константе API
 const api = initData(sourceData);
 
 /**
- * Сбор и обработка полей таблицы
+ * Сбор и обработка таблиц
  */
 function collectState() {
   const state = processFormData(new FormData(sampleTable.container));
+  const rowsPerPage = parseInt(state.rowsPerPage);
+  const page = parseInt(state.page ?? 1);
   
-  // ← исправлено: ?? не спасает от пустой строки, используем ||
-  const rowsPerPage = parseInt(state.rowsPerPage, 10) || 10;
-  const page = parseInt(state.page, 10) || 1;
-
   if (state.totalFrom || state.totalTo) {
     state.total = [
-      state.totalFrom ? parseFloat(state.totalFrom) : undefined,
+      state.totalFrom ? parseFloat(state.totalFrom) : undefined, 
       state.totalTo ? parseFloat(state.totalTo) : undefined
     ];
     delete state.totalFrom;
     delete state.totalTo;
   }
-
+  
   return { ...state, rowsPerPage, page };
 }
 
 /**
- * 2. Функцию render() делаем асинхронной
+ * 2. Функция render() выполняется асинхронно
  */
 async function render(action) {
   let state = collectState();
+
+  // Заменяем копирование данных на пустой запрос объекта
   let query = {};
-  
+
+  // Запускаем конвейер (теперь он модифицирует запрос, а не данные)
   query = applySearch(query, state, action);
   query = applyFiltering(query, state, action);
   query = applySorting(query, state, action);
   query = applyPagination(query, state, action);
-  
+
+  // Делаем запрос к серверу с собранными параметрами
   const { total, items } = await api.getRecords(query);
-  
+
+  // Обновляем UI после получения ответа
   updatePagination(total, query);
-  sampleTable.render(items); 
+  sampleTable.render(items);
 }
 
 const sampleTable = initTable({
-    tableTemplate: 'table',
-    rowTemplate: 'row',
-    before: ['search', 'header', 'filter'], 
-    after: ['pagination']
+  tableTemplate: 'table',
+  rowTemplate: 'row',
+  before: ['search', 'header', 'filter'],
+  after: ['pagination']
 }, render);
 
-// Инициализация компонентов (достаем две функции из пагинации и фильтрации)
+// Инициализация компонентов (достаем две функции пагинации и фильтрации)
 const {applyPagination, updatePagination} = initPagination(
-    sampleTable.pagination.elements,             
-    (el, page, isCurrent) => {                    
-        const input = el.querySelector('input');
-        const label = el.querySelector('span');
-        input.value = page;
-        input.checked = isCurrent;
-        label.textContent = page;
-        return el;
-    }
+  sampleTable.pagination.elements,
+  (el, page, isCurrent) => {
+    const input = el.querySelector('input');
+    const label = el.querySelector('span');
+    input.value = page;
+    input.checked = isCurrent;
+    label.textContent = page;
+    return el;
+  }
 );
 
 const applySorting = initSorting([
-    sampleTable.header.elements.sortByDate,
-    sampleTable.header.elements.sortByTotal
+  sampleTable.header.elements.sortByDate,
+  sampleTable.header.elements.sortByTotal
 ]);
 
 const {applyFiltering, updateIndexes} = initFiltering(sampleTable.filter.elements);
 
+// Если в HTML у поля поиска name="search", должно быть 'search'. 
+// Если там написано name="поиск", верните 'поиск'
 const applySearch = initSearching('search');
 
 const appRoot = document.querySelector('#app');
 appRoot.appendChild(sampleTable.container);
 
-// Асинхронная функция инициализации
+// Асинхронная функция создания
 async function init() {
-    // Получаем индексы с сервера
-    const indexes = await api.getIndexes();
-
-    // Заполняем селекты фильтрации
-    updateIndexes(sampleTable.filter.elements, {
-        searchBySeller: indexes.sellers
-    });
+  // Получаем индексы с сервера
+  const indexes = await api.getIndexes();
+  // Заполняем выбранные фильтры
+  updateIndexes(sampleTable.filter.elements, { searchBySeller: indexes.sellers });
 }
 
 // Запуск: сначала инициализация (загрузка селектов), затем рендер
