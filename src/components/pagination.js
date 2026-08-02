@@ -2,11 +2,6 @@ import { getPages } from "../lib/utils.js";
 
 export function initPagination(elements, createPage) {
   const { pages, fromRow, toRow, totalRows } = elements;
-  const pageTemplate = pages.firstElementChild?.cloneNode(true);
-  if (pages.firstElementChild) {
-    pages.firstElementChild.remove();
-  }
-  
   let pageCount;
 
   const applyPagination = (query, state, action) => {
@@ -31,6 +26,15 @@ export function initPagination(elements, createPage) {
     pageCount = Math.ceil(total / limit);
     const visiblePages = getPages(page, pageCount, 5);
     
+    // ИСПРАВЛЕНО: Клонируем шаблон ПРИ каждой отрисовке, чтобы точно не словить null
+    const pageTemplate = pages.firstElementChild?.cloneNode(true);
+    if (pages.firstElementChild) {
+      pages.firstElementChild.remove();
+    }
+
+    // Если шаблона не было вообще - просто выходим, чтобы не упасть с ошибкой
+    if (!pageTemplate) return;
+
     pages.replaceChildren(...visiblePages.map(pageNumber => {
       const el = pageTemplate.cloneNode(true);
       return createPage(el, pageNumber, pageNumber === page);

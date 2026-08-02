@@ -1,6 +1,7 @@
 import "./fonts/ys-display/fonts.css";
 import "./style.css";
 
+import { data as sourceData } from "./data/dataset_1.js"; // ВОССТАНОВЛЕНО
 import { initData } from "./data.js";
 import { processFormData } from "./lib/utils.js";
 
@@ -10,7 +11,8 @@ import { initSorting } from "./components/sorting.js";
 import { initFiltering } from "./components/filtering.js";
 import { initSearching } from "./components/searching.js";
 
-const api = initData();
+// ВОССТАНОВЛЕНО: Передаем локальные данные
+const api = initData(sourceData); 
 
 function collectState() {
   const state = processFormData(new FormData(sampleTable.container));
@@ -30,20 +32,16 @@ function collectState() {
 }
 
 async function render(action) {
-  try {
-    const state = collectState();
-    let query = {};
-    query = applySearch(query, state, action);
-    query = applyFiltering(query, state, action);
-    query = applySorting(query, state, action);
-    query = applyPagination(query, state, action);
+  const state = collectState();
+  let query = {};
+  query = applySearch(query, state, action);
+  query = applyFiltering(query, state, action);
+  query = applySorting(query, state, action);
+  query = applyPagination(query, state, action);
 
-    const { total, items } = await api.getRecords(query);
-    updatePagination(total, query);
-    sampleTable.render(items);
-  } catch (error) {
-    console.error('Failed to render table', error);
-  }
+  const { total, items } = await api.getRecords(query);
+  updatePagination(total, query);
+  sampleTable.render(items);
 }
 
 const sampleTable = initTable({
