@@ -1,5 +1,10 @@
 import {sortMap} from "../lib/sort.js";
 
+const orderMap = {
+  'up': 'asc',
+  'down': 'desc'
+};
+
 export function initSorting(columns) {
   return (query, state, action) => {
     let field = null;
@@ -23,7 +28,9 @@ export function initSorting(columns) {
       });
     }
 
-    const sort = (field && order !== 'none') ? `${field}:${order}` : null;
+    const sortOrder = orderMap[order] || null;
+    const sort = (field && sortOrder) ? `${field}:${sortOrder}` : null;
+    
     return sort ? Object.assign({}, query, { sort }) : query;
   }
 }
