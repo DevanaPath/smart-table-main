@@ -19,17 +19,10 @@ export function initData() {
     // функция получения индексов
     const getIndexes = async () => {
         if (!sellers || !customers) {
-            try {
-                [sellers, customers] = await Promise.all([
-                    fetch(`${BASE_URL}/sellers`).then(res => res.json()),
-                    fetch(`${BASE_URL}/customers`).then(res => res.json()),
-                ]);
-            } catch (error) {
-                console.error("Failed to fetch indexes:", error);
-                // Задаем пустые объекты при ошибке, чтобы приложение не упало
-                sellers = {};
-                customers = {};
-            }
+            [sellers, customers] = await Promise.all([
+                fetch(`${BASE_URL}/sellers`).then(res => res.json()),
+                fetch(`${BASE_URL}/customers`).then(res => res.json()),
+            ]);
         }
 
         return { sellers, customers };
@@ -41,27 +34,19 @@ export function initData() {
         const nextQuery = qs.toString();
 
         if (lastQuery === nextQuery && !isUpdated) {
-            return lastResult || { total: 0, items: [] };
-        }
-
-        try {
-            const response = await fetch(`${BASE_URL}/records?${nextQuery}`);
-            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-            
-            const records = await response.json();
-
-            lastQuery = nextQuery;
-            lastResult = {
-                total: records.total,
-                items: mapRecords(records.items)
-            };
-
             return lastResult;
-        } catch (error) {
-            console.error("Failed to fetch records:", error);
-            // Возвращаем пустые данные при ошибке сети
-            return { total: 0, items: [] };
         }
+
+        const response = await fetch(`${BASE_URL}/records?${nextQuery}`);
+        const records = await response.json();
+
+        lastQuery = nextQuery;
+        lastResult = {
+            total: records.total,
+            items: mapRecords(records.items)
+        };
+
+        return lastResult;
     };
 
     return {
