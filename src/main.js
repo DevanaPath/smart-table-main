@@ -74,9 +74,9 @@ appRoot.appendChild(sampleTable.container);
 
 // Асинхронная функция создания
 async function init() {
-    // Получаем индексы с сервера
+
     const indexes = await api.getIndexes();
-    // Заполняем выбранные фильтры
+
     updateIndexes(sampleTable.filter.elements, {
         searchBySeller: indexes.sellers
     });
