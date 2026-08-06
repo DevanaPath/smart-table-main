@@ -22,7 +22,7 @@ export function initTable(settings, onAction) {
   });
 
   const render = (data) => {
-  
+
     if (!Array.isArray(data)) {
       data = [];
     }

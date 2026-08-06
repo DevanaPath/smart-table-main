@@ -13,7 +13,7 @@ const api = initData();
 
 function collectState() {
     const state = processFormData(new FormData(sampleTable.container));
-    const rowsPerPage = parseInt(state.rowsPerPage) || 10; // защита от NaN и пустой строки
+    const rowsPerPage = parseInt(state.rowsPerPage) || 10;
     const page = parseInt(state.page ?? 1) || 1;
     return { ...state, rowsPerPage, page };
 }
