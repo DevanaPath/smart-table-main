@@ -5,8 +5,8 @@ export function initPagination(elements, createPage) {
     let pageCount;
 
     const applyPagination = (query, state, action) => {
-        const limit = state.rowsPerPage;
-        let page = state.page;
+        const limit = state.rowsPerPage || 10;
+        let page = state.page || 1;
 
         if (action) {
             switch(action.name) {

@@ -22,7 +22,7 @@ export function initTable(settings, onAction) {
   });
 
   const render = (data) => {
-    // ИСПРАВЛЕНО: Защита на случай если data придет undefined или null
+  
     if (!Array.isArray(data)) {
       data = [];
     }
