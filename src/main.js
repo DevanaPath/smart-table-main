@@ -13,8 +13,8 @@ const api = initData();
 
 function collectState() {
     const state = processFormData(new FormData(sampleTable.container));
-    const rowsPerPage = parseInt(state.rowsPerPage) || 10;
-    const page = parseInt(state.page ?? 1) || 1;
+    const rowsPerPage = parseInt(state.rowsPerPage);
+    const page = parseInt(state.page ?? 1);
     return { ...state, rowsPerPage, page };
 }
 
@@ -32,13 +32,19 @@ async function render(action) {
     query = applySorting(query, state, action);
     query = applyPagination(query, state, action);
 
+    console.log('Final query for API:', query);
+
     // Делаем запрос к серверу с собранными параметрами
     const { total, items } = await api.getRecords(query);
+
+    console.log('Data received for render:', { total, itemsCount: items.length });
+
 
     // Обновляем UI после получения ответа
     updatePagination(total, query);
     sampleTable.render(items);
-}
+} 
+
 
 const sampleTable = initTable({
     tableTemplate: 'table',
