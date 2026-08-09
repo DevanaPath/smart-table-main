@@ -10,13 +10,15 @@ import {initSorting} from "./components/sorting.js";
 import {initFiltering} from "./components/filtering.js";
 import {initSearching} from "./components/searching.js";
 
-// Получаем объект API
 const api = initData();
 
 function collectState() {
     const state = processFormData(new FormData(sampleTable.container));
-    const rowsPerPage = parseInt(state.rowsPerPage);
-    const page = parseInt(state.page ?? 1);
+    
+    // ЗАЩИТА: если парсинг вернет NaN, подставим значения по умолчанию (10 строк, 1 страница)
+    const rowsPerPage = parseInt(state.rowsPerPage) || 10;
+    const page = parseInt(state.page) || 1;
+    
     return { ...state, rowsPerPage, page };
 }
 
@@ -66,9 +68,7 @@ const applySearching = initSearching('search');
 const appRoot = document.querySelector('#app');
 appRoot.appendChild(sampleTable.container);
 
-// ИСМПРАВЛЕНИЕ ЗДЕСЬ: Используем top-level await.
-// Скрипт "зависнет" на этих строках, пока данные не загрузятся и не отрисуются.
-// Только после этого страница будет считаться готовой для тестов.
+// Ждем загрузки индексов и первый рендер до того, как страница считается загруженной
 const indexes = await api.getIndexes();
 updateIndexes(sampleTable.filter.elements, {
     searchBySeller: indexes.sellers
