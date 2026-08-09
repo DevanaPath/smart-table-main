@@ -33,16 +33,12 @@ export function initData() {
         const qs = new URLSearchParams(query);
         const nextQuery = qs.toString();
 
-        console.log('Fetching records with query:', nextQuery);
-
         if (lastQuery === nextQuery && !isUpdated) {
             return lastResult;
         }
 
         const response = await fetch(`${BASE_URL}/records?${nextQuery}`);
         const records = await response.json();
-
-        console.log('Received records:', records);
 
         lastQuery = nextQuery;
         lastResult = {

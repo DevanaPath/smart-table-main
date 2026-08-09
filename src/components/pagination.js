@@ -26,6 +26,8 @@ export function initPagination(elements, createPage) {
     const updatePagination = (total, { page, limit }) => {
         pageCount = Math.ceil(total / limit);
 
+        if (!pages.firstElementChild) return;
+
         const pageTemplate = pages.firstElementChild.cloneNode(true);
         pages.firstElementChild.remove();
         
