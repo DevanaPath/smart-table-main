@@ -34,7 +34,7 @@ export function initData() {
         const nextQuery = qs.toString();
 
         if (lastQuery === nextQuery && !isUpdated) {
-            return lastResult; 
+            return lastResult;
         }
 
         const response = await fetch(`${BASE_URL}/records?${nextQuery}`);

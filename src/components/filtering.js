@@ -24,7 +24,7 @@ export function initFiltering(elements) {
         Object.keys(elements).forEach(key => {
             if (elements[key]) {
                 if (['INPUT', 'SELECT'].includes(elements[key].tagName) && elements[key].value) {
-                    filter[`filter[${elements[key].name}]`] = elements[key].value; 
+                    filter[`filter[${elements[key].name}]`] = elements[key].value;
                 }
             }
         })

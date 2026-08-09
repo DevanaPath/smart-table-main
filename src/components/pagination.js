@@ -4,11 +4,11 @@ export const initPagination = ({pages, fromRow, toRow, totalRows}, createPage) =
     const pageTemplate = pages.firstElementChild.cloneNode(true);
     pages.firstElementChild.remove();
 
-    let pageCount;
+    let pageCount = 1;
 
     const applyPagination = (query, state, action) => {
-        const limit = state.rowsPerPage;
-        let page = state.page;
+        const limit = parseInt(state.rowsPerPage) || 10;
+        let page = parseInt(state.page) || 1;
 
         if (action) switch(action.name) {
             case 'prev': page = Math.max(1, page - 1); break;
@@ -17,7 +17,7 @@ export const initPagination = ({pages, fromRow, toRow, totalRows}, createPage) =
             case 'last': page = pageCount; break;
         }
 
-        return Object.assign({}, query, { 
+        return Object.assign({}, query, {
             limit,
             page
         });

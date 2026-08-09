@@ -14,13 +14,13 @@ const api = initData();
 
 function collectState() {
     const state = processFormData(new FormData(sampleTable.container));
-    const rowsPerPage = parseInt(state.rowsPerPage);
-    const page = parseInt(state.page ?? 1);
+    const rowsPerPage = parseInt(state.rowsPerPage) || 10;
+    const page = parseInt(state.page) || 1;
     return { ...state, rowsPerPage, page };
 }
 
 async function render(action) {
-    let state = collectState(); 
+    let state = collectState();
     let query = {};
     
     query = applySearching(query, state, action);
@@ -28,9 +28,9 @@ async function render(action) {
     query = applySorting(query, state, action);
     query = applyPagination(query, state, action);
 
-    const { total, items } = await api.getRecords(query); 
+    const { total, items } = await api.getRecords(query);
 
-    updatePagination(total, query); 
+    updatePagination(total, query);
     sampleTable.render(items);
 }
 
@@ -65,11 +65,10 @@ const applySearching = initSearching('search');
 const appRoot = document.querySelector('#app');
 appRoot.appendChild(sampleTable.container);
 
-async function init() {
-    const indexes = await api.getIndexes();
-    updateIndexes(sampleTable.filter.elements, {
-        searchBySeller: indexes.sellers
-    });
-}
 
-init().then(render);
+const indexes = await api.getIndexes();
+updateIndexes(sampleTable.filter.elements, {
+    searchBySeller: indexes.sellers
+});
+
+await render();
