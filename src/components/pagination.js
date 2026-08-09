@@ -4,20 +4,20 @@ export const initPagination = ({pages, fromRow, toRow, totalRows}, createPage) =
     const pageTemplate = pages.firstElementChild.cloneNode(true);
     pages.firstElementChild.remove();
 
-    let pageCount = 1; // Инициализация чтобы не было ошибок в Math
+    let pageCount = 1;
 
     const applyPagination = (query, state, action) => {
-        const limit = parseInt(state.rowsPerPage) || 10; // Защита от NaN
-        let page = parseInt(state.page) || 1;           // Защита от NaN
+        const limit = parseInt(state.rowsPerPage) || 10;
+        let page = parseInt(state.page) || 1;
 
         if (action) switch(action.name) {
-            case 'prev': page = Math.max(1, page - 1); break;            
-            case 'next': page = Math.min(pageCount, page + 1); break;    
-            case 'first': page = 1; break;                                
-            case 'last': page = pageCount; break;                        
+            case 'prev': page = Math.max(1, page - 1); break;
+            case 'next': page = Math.min(pageCount, page + 1); break;
+            case 'first': page = 1; break;
+            case 'last': page = pageCount; break;
         }
 
-        return Object.assign({}, query, { 
+        return Object.assign({}, query, {
             limit,
             page
         });
@@ -26,15 +26,15 @@ export const initPagination = ({pages, fromRow, toRow, totalRows}, createPage) =
     const updatePagination = (total, { page, limit }) => {
         pageCount = Math.ceil(total / limit);
 
-        const visiblePages = getPages(page, pageCount, 5);                
-        pages.replaceChildren(...visiblePages.map(pageNumber => {        
-            const el = pageTemplate.cloneNode(true);                    
-            return createPage(el, pageNumber, pageNumber === page);        
+        const visiblePages = getPages(page, pageCount, 5);
+        pages.replaceChildren(...visiblePages.map(pageNumber => {
+            const el = pageTemplate.cloneNode(true);
+            return createPage(el, pageNumber, pageNumber === page);
         }));
 
-        fromRow.textContent = (page - 1) * limit + 1;                    
-        toRow.textContent = Math.min((page * limit), total);    
-        totalRows.textContent = total;                                
+        fromRow.textContent = (page - 1) * limit + 1;
+        toRow.textContent = Math.min((page * limit), total);
+        totalRows.textContent = total;
     }
 
     return {
