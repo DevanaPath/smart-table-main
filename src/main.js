@@ -1,7 +1,6 @@
 import './fonts/ys-display/fonts.css'
 import './style.css'
 
-import {data as sourceData} from "./data/dataset_1.js";
 import {initData} from "./data.js";
 import {processFormData} from "./lib/utils.js";
 
@@ -11,37 +10,32 @@ import {initSorting} from "./components/sorting.js";
 import {initFiltering} from "./components/filtering.js";
 import {initSearching} from "./components/searching.js";
 
-const {data, ...indexes} = initData(sourceData);
+const api = initData();
 
 function collectState() {
     const state = processFormData(new FormData(sampleTable.container));
-    const rowsPerPage = parseInt(state.rowsPerPage);
-    const page = parseInt(state.page ?? 1);
-
-    // ВОТ ОН — КОД ДЛЯ ПРЕОБРАЗОВАНИЯ ДИАПАЗОНА СУММЫ
-    if (state.totalFrom || state.totalTo) {
-        state.total = [
-            state.totalFrom ? parseFloat(state.totalFrom) : undefined,
-            state.totalTo ? parseFloat(state.totalTo) : undefined
-        ];
-        // Удаляем старые отдельные поля, чтобы компаратор не запутался
-        delete state.totalFrom;
-        delete state.totalTo;
-    }
-
+    // Защита от NaN, чтобы сервер точно получил числа
+    const rowsPerPage = parseInt(state.rowsPerPage) || 10;
+    const page = parseInt(state.page) || 1;
     return { ...state, rowsPerPage, page };
 }
 
-function render(action) {
+async function render(action) {
     let state = collectState(); 
-    let result = [...data]; 
+    let query = {}; 
     
-    result = applySearching(result, state, action);
-    result = applyFiltering(result, state, action);
-    result = applySorting(result, state, action);
-    result = applyPagination(result, state, action);
+    // Собираем параметры для URL
+    query = applySearching(query, state, action);
+    query = applyFiltering(query, state, action);
+    query = applySorting(query, state, action);
+    query = applyPagination(query, state, action);
 
-    sampleTable.render(result);
+    // Получаем данные с сервера
+    const { total, items } = await api.getRecords(query); 
+
+    // Перерисовываем пагинацию на основе ответа
+    updatePagination(total, query); 
+    sampleTable.render(items);
 }
 
 const sampleTable = initTable({
@@ -51,7 +45,7 @@ const sampleTable = initTable({
     after: ['pagination']
 }, render);
 
-const applyPagination = initPagination(
+const {applyPagination, updatePagination} = initPagination(
     sampleTable.pagination.elements,             
     (el, page, isCurrent) => {
         const input = el.querySelector('input');
@@ -68,13 +62,16 @@ const applySorting = initSorting([
     sampleTable.header.elements.sortByTotal
 ]);
 
-const applyFiltering = initFiltering(sampleTable.filter.elements, {    
-    searchBySeller: indexes.sellers                                    
-}); 
+const {applyFiltering, updateIndexes} = initFiltering(sampleTable.filter.elements);
 
 const applySearching = initSearching('search');
 
 const appRoot = document.querySelector('#app');
 appRoot.appendChild(sampleTable.container);
 
-render();
+const indexes = await api.getIndexes();
+updateIndexes(sampleTable.filter.elements, {
+    searchBySeller: indexes.sellers
+});
+
+await render();
