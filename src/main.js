@@ -14,8 +14,9 @@ const api = initData();
 
 function collectState() {
     const state = processFormData(new FormData(sampleTable.container));
-    const rowsPerPage = parseInt(state.rowsPerPage);
-    const page = parseInt(state.page ?? 1);
+    // ЗАЩИТА ОТ NaN: если значение не досталось из формы, подставляем по умолчанию
+    const rowsPerPage = parseInt(state.rowsPerPage) || 10;
+    const page = parseInt(state.page) || 1;
     return { ...state, rowsPerPage, page };
 }
 
@@ -65,12 +66,11 @@ const applySearching = initSearching('search');
 const appRoot = document.querySelector('#app');
 appRoot.appendChild(sampleTable.container);
 
-// Точно как в конце Шага 1 и Шага 3
-async function init() {
-    const indexes = await api.getIndexes();
-    updateIndexes(sampleTable.filter.elements, {
-        searchBySeller: indexes.sellers
-    });
-}
+// РЕШЕНИЕ: Top-level await. 
+// Это заставляет Playwright ждать отрисовки таблицы перед началом тестов!
+const indexes = await api.getIndexes();
+updateIndexes(sampleTable.filter.elements, {
+    searchBySeller: indexes.sellers
+});
 
-init().then(render);
+await render();
