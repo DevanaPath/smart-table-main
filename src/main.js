@@ -14,7 +14,6 @@ const api = initData();
 
 function collectState() {
     const state = processFormData(new FormData(sampleTable.container));
-    // Защита от NaN, чтобы сервер точно получил числа
     const rowsPerPage = parseInt(state.rowsPerPage) || 10;
     const page = parseInt(state.page) || 1;
     return { ...state, rowsPerPage, page };
@@ -24,16 +23,13 @@ async function render(action) {
     let state = collectState(); 
     let query = {}; 
     
-    // Собираем параметры для URL
     query = applySearching(query, state, action);
     query = applyFiltering(query, state, action);
     query = applySorting(query, state, action);
     query = applyPagination(query, state, action);
 
-    // Получаем данные с сервера
     const { total, items } = await api.getRecords(query); 
 
-    // Перерисовываем пагинацию на основе ответа
     updatePagination(total, query); 
     sampleTable.render(items);
 }
