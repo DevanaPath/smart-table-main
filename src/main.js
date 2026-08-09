@@ -17,6 +17,18 @@ function collectState() {
     const state = processFormData(new FormData(sampleTable.container));
     const rowsPerPage = parseInt(state.rowsPerPage);
     const page = parseInt(state.page ?? 1);
+
+    // ВОТ ОН — КОД ДЛЯ ПРЕОБРАЗОВАНИЯ ДИАПАЗОНА СУММЫ
+    if (state.totalFrom || state.totalTo) {
+        state.total = [
+            state.totalFrom ? parseFloat(state.totalFrom) : undefined,
+            state.totalTo ? parseFloat(state.totalTo) : undefined
+        ];
+        // Удаляем старые отдельные поля, чтобы компаратор не запутался
+        delete state.totalFrom;
+        delete state.totalTo;
+    }
+
     return { ...state, rowsPerPage, page };
 }
 
