@@ -1,6 +1,7 @@
 import './fonts/ys-display/fonts.css'
 import './style.css'
 
+import {data as sourceData} from "./data/dataset_1.js";
 import {initData} from "./data.js";
 import {processFormData} from "./lib/utils.js";
 
@@ -10,28 +11,25 @@ import {initSorting} from "./components/sorting.js";
 import {initFiltering} from "./components/filtering.js";
 import {initSearching} from "./components/searching.js";
 
-const api = initData();
+const {data, ...indexes} = initData(sourceData);
 
 function collectState() {
     const state = processFormData(new FormData(sampleTable.container));
-    const rowsPerPage = parseInt(state.rowsPerPage) || 10;
-    const page = parseInt(state.page) || 1;
+    const rowsPerPage = parseInt(state.rowsPerPage);
+    const page = parseInt(state.page ?? 1);
     return { ...state, rowsPerPage, page };
 }
 
-async function render(action) {
-    let state = collectState();
-    let query = {};
+function render(action) {
+    let state = collectState(); 
+    let result = [...data]; 
     
-    query = applySearching(query, state, action);
-    query = applyFiltering(query, state, action);
-    query = applySorting(query, state, action);
-    query = applyPagination(query, state, action);
+    result = applySearching(result, state, action);
+    result = applyFiltering(result, state, action);
+    result = applySorting(result, state, action);
+    result = applyPagination(result, state, action);
 
-    const { total, items } = await api.getRecords(query);
-
-    updatePagination(total, query);
-    sampleTable.render(items);
+    sampleTable.render(result);
 }
 
 const sampleTable = initTable({
@@ -41,8 +39,8 @@ const sampleTable = initTable({
     after: ['pagination']
 }, render);
 
-const {applyPagination, updatePagination} = initPagination(
-    sampleTable.pagination.elements,
+const applyPagination = initPagination(
+    sampleTable.pagination.elements,             
     (el, page, isCurrent) => {
         const input = el.querySelector('input');
         const label = el.querySelector('span');
@@ -53,22 +51,18 @@ const {applyPagination, updatePagination} = initPagination(
     }
 );
 
-const applySorting = initSorting([
+const applySorting = initSorting([        
     sampleTable.header.elements.sortByDate,
     sampleTable.header.elements.sortByTotal
 ]);
 
-const {applyFiltering, updateIndexes} = initFiltering(sampleTable.filter.elements);
+const applyFiltering = initFiltering(sampleTable.filter.elements, {    
+    searchBySeller: indexes.sellers                                    
+}); 
 
 const applySearching = initSearching('search');
 
 const appRoot = document.querySelector('#app');
 appRoot.appendChild(sampleTable.container);
 
-
-const indexes = await api.getIndexes();
-updateIndexes(sampleTable.filter.elements, {
-    searchBySeller: indexes.sellers
-});
-
-await render();
+render();
