@@ -24,6 +24,7 @@ export function initData() {
                 fetch(`${BASE_URL}/customers`).then(res => res.json()), 
             ]);
         }
+
         return { sellers, customers };
     }
 

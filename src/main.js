@@ -14,11 +14,8 @@ const api = initData();
 
 function collectState() {
     const state = processFormData(new FormData(sampleTable.container));
-    
-    // ЗАЩИТА: если парсинг вернет NaN, подставим значения по умолчанию (10 строк, 1 страница)
-    const rowsPerPage = parseInt(state.rowsPerPage) || 10;
-    const page = parseInt(state.page) || 1;
-    
+    const rowsPerPage = parseInt(state.rowsPerPage);
+    const page = parseInt(state.page ?? 1);
     return { ...state, rowsPerPage, page };
 }
 
@@ -68,10 +65,12 @@ const applySearching = initSearching('search');
 const appRoot = document.querySelector('#app');
 appRoot.appendChild(sampleTable.container);
 
-// Ждем загрузки индексов и первый рендер до того, как страница считается загруженной
-const indexes = await api.getIndexes();
-updateIndexes(sampleTable.filter.elements, {
-    searchBySeller: indexes.sellers
-});
+// Точно как в конце Шага 1 и Шага 3
+async function init() {
+    const indexes = await api.getIndexes();
+    updateIndexes(sampleTable.filter.elements, {
+        searchBySeller: indexes.sellers
+    });
+}
 
-await render();
+init().then(render);

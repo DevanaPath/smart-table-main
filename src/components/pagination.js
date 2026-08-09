@@ -7,9 +7,8 @@ export const initPagination = ({pages, fromRow, toRow, totalRows}, createPage) =
     let pageCount;
 
     const applyPagination = (query, state, action) => {
-        // ЗАЩИТА: парсим с подстраховкой
-        const limit = parseInt(state.rowsPerPage) || 10;
-        let page = parseInt(state.page) || 1;
+        const limit = state.rowsPerPage;
+        let page = state.page;
 
         if (action) switch(action.name) {
             case 'prev': page = Math.max(1, page - 1); break;            
