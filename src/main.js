@@ -20,7 +20,7 @@ function collectState() {
 }
 
 async function render(action) {
-    let state = collectState();
+    let state = collectState(); 
     let query = {}; 
     
     query = applySearching(query, state, action);
@@ -28,9 +28,9 @@ async function render(action) {
     query = applySorting(query, state, action);
     query = applyPagination(query, state, action);
 
-    const { total, items } = await api.getRecords(query);
+    const { total, items } = await api.getRecords(query); 
 
-    updatePagination(total, query);
+    updatePagination(total, query); 
     sampleTable.render(items);
 }
 
@@ -42,7 +42,7 @@ const sampleTable = initTable({
 }, render);
 
 const {applyPagination, updatePagination} = initPagination(
-    sampleTable.pagination.elements,
+    sampleTable.pagination.elements,             
     (el, page, isCurrent) => {
         const input = el.querySelector('input');
         const label = el.querySelector('span');
@@ -53,7 +53,7 @@ const {applyPagination, updatePagination} = initPagination(
     }
 );
 
-const applySorting = initSorting([
+const applySorting = initSorting([        
     sampleTable.header.elements.sortByDate,
     sampleTable.header.elements.sortByTotal
 ]);
@@ -64,7 +64,6 @@ const applySearching = initSearching('search');
 
 const appRoot = document.querySelector('#app');
 appRoot.appendChild(sampleTable.container);
-
 
 const indexes = await api.getIndexes();
 updateIndexes(sampleTable.filter.elements, {
