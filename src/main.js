@@ -10,7 +10,7 @@ import {initSorting} from "./components/sorting.js";
 import {initFiltering} from "./components/filtering.js";
 import {initSearching} from "./components/searching.js";
 
-// Теперь initData возвращает объект с методами для запросов к серверу
+// Получаем объект API
 const api = initData();
 
 function collectState() {
@@ -20,24 +20,18 @@ function collectState() {
     return { ...state, rowsPerPage, page };
 }
 
-// Рендер становится асинхронным, так как ждёт ответа от сервера
 async function render(action) {
     let state = collectState(); 
-    let query = {}; // здесь собираем параметры для URL
+    let query = {}; 
     
-    // Собираем запрос по цепочке: Поиск -> Фильтрация -> Сортировка -> Пагинация
     query = applySearching(query, state, action);
     query = applyFiltering(query, state, action);
     query = applySorting(query, state, action);
     query = applyPagination(query, state, action);
 
-    // Отправляем запрос на сервер и получаем готовые строки и их общее количество
     const { total, items } = await api.getRecords(query); 
 
-    // Перерисовываем пагинатор, опираясь на total от сервера
     updatePagination(total, query); 
-    
-    // Рендерим полученные элементы в таблицу
     sampleTable.render(items);
 }
 
@@ -48,7 +42,6 @@ const sampleTable = initTable({
     after: ['pagination']
 }, render);
 
-// Инициализация компонентов (теперь они возвращают функции для работы с query)
 const {applyPagination, updatePagination} = initPagination(
     sampleTable.pagination.elements,             
     (el, page, isCurrent) => {
@@ -73,13 +66,12 @@ const applySearching = initSearching('search');
 const appRoot = document.querySelector('#app');
 appRoot.appendChild(sampleTable.container);
 
-// Функция первичной подготовки (загружает списки продавцов для фильтров)
-async function init() {
-    const indexes = await api.getIndexes();
-    updateIndexes(sampleTable.filter.elements, {
-        searchBySeller: indexes.sellers
-    });
-}
+// ИСМПРАВЛЕНИЕ ЗДЕСЬ: Используем top-level await.
+// Скрипт "зависнет" на этих строках, пока данные не загрузятся и не отрисуются.
+// Только после этого страница будет считаться готовой для тестов.
+const indexes = await api.getIndexes();
+updateIndexes(sampleTable.filter.elements, {
+    searchBySeller: indexes.sellers
+});
 
-// Запуск: сначала подгружаем индексы, затем отрисовываем таблицу
-init().then(render);
+await render();
