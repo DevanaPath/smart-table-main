@@ -1,4 +1,4 @@
-const BASE_URL = 'https://webinars.webdev.education-services.ru/sp7-api';
+const BASE_URL = 'https://webinars.webdev.education-services.ru/sp7-api'; 
 
 export function initData() {
     // переменные для кеширования данных
@@ -18,29 +18,28 @@ export function initData() {
 
     // функция получения индексов
     const getIndexes = async () => {
-        if (!sellers || !customers) {
-            [sellers, customers] = await Promise.all([
-                fetch(`${BASE_URL}/sellers`).then(res => res.json()),
-                fetch(`${BASE_URL}/customers`).then(res => res.json()),
+        if (!sellers || !customers) { 
+            [sellers, customers] = await Promise.all([ 
+                fetch(`${BASE_URL}/sellers`).then(res => res.json()), 
+                fetch(`${BASE_URL}/customers`).then(res => res.json()), 
             ]);
         }
-
         return { sellers, customers };
-    };
+    }
 
     // функция получения записей о продажах с сервера
     const getRecords = async (query, isUpdated = false) => {
-        const qs = new URLSearchParams(query);
-        const nextQuery = qs.toString();
+        const qs = new URLSearchParams(query); 
+        const nextQuery = qs.toString(); 
 
-        if (lastQuery === nextQuery && !isUpdated) {
-            return lastResult;
+        if (lastQuery === nextQuery && !isUpdated) { 
+            return lastResult; 
         }
 
         const response = await fetch(`${BASE_URL}/records?${nextQuery}`);
         const records = await response.json();
 
-        lastQuery = nextQuery;
+        lastQuery = nextQuery; 
         lastResult = {
             total: records.total,
             items: mapRecords(records.items)
@@ -52,5 +51,5 @@ export function initData() {
     return {
         getIndexes,
         getRecords
-    };
+    }; 
 }
