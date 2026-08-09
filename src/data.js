@@ -19,7 +19,7 @@ export function initData() {
     // функция получения индексов
     const getIndexes = async () => {
         if (!sellers || !customers) {
-            [sellers, customers] = await Promise.all([ 
+            [sellers, customers] = await Promise.all([
                 fetch(`${BASE_URL}/sellers`).then(res => res.json()),
                 fetch(`${BASE_URL}/customers`).then(res => res.json()),
             ]);
@@ -34,7 +34,7 @@ export function initData() {
         const nextQuery = qs.toString();
 
         if (lastQuery === nextQuery && !isUpdated) {
-            return lastResult;
+            return lastResult; 
         }
 
         const response = await fetch(`${BASE_URL}/records?${nextQuery}`);
@@ -52,5 +52,5 @@ export function initData() {
     return {
         getIndexes,
         getRecords
-    }; 
+    };
 }

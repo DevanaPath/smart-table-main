@@ -23,13 +23,13 @@ export function initFiltering(elements) {
         const filter = {};
         Object.keys(elements).forEach(key => {
             if (elements[key]) {
-                if (['INPUT', 'SELECT'].includes(elements[key].tagName) && elements[key].value) { 
+                if (['INPUT', 'SELECT'].includes(elements[key].tagName) && elements[key].value) {
                     filter[`filter[${elements[key].name}]`] = elements[key].value; 
                 }
             }
         })
 
-        return Object.keys(filter).length ? Object.assign({}, query, filter) : query; 
+        return Object.keys(filter).length ? Object.assign({}, query, filter) : query;
     }
 
     return {
