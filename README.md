@@ -1,1 +1,1 @@
-(https://github.com/DevanaPath/smart-table-main)
+(https://github.com/DevanaPath/smart-table)
